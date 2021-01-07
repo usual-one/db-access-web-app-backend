@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,19 +14,28 @@ namespace Backend.Controllers
     public class StructureController : ControllerBase
     {
 
+        public StructureController()
+        {
+            this.db = new Services.Database();
+        }
+
+        private Services.Database db;
+
         // GET structure/faculties
         [HttpGet("faculties")]
-        public async Task<ActionResult<List<Faculty>>> Faculties([FromQuery] int? count = 10,
-                                                                 [FromQuery] int? offset = 0)
+        public async Task<ActionResult<List<Faculty>>> Faculties([FromQuery] int count = 10,
+                                                                 [FromQuery] int offset = 0)
         {
+            return await this.db.getFaculties(count, offset);
         }
 
         // GET structure/groups
         [HttpGet("groups")]
-        public async Task<ActionResult<List<Group>>> Faculties([FromQuery] string? facultyname = "",
-                                                               [FromQuery] int? count = 10,
-                                                               [FromQuery] int? offset = 0)
+        public async Task<ActionResult<List<Group>>> Faculties([FromQuery] string facultyname = "",
+                                                               [FromQuery] int count = 10,
+                                                               [FromQuery] int offset = 0)
         {
+            return await this.db.getGroups(facultyname, count, offset);
         }
 
     }
