@@ -15,17 +15,28 @@ namespace Backend.Controllers
     public class TeachersController : ControllerBase
     {
 
+        public TeachersController()
+        {
+            this.db = new Services.Database();
+        }
+
+        private Services.Database db;
+
         // GET teachers
         [HttpGet]
-        public async Task<ActionResult<List<Teacher>>> Get([FromQuery] string? facultyName = "")
+        public async Task<ActionResult<List<Teacher>>> Get([FromQuery] string facultyName,
+                                                           [FromQuery] int count,
+                                                           [FromQuery] int offset )
         {
-            return new List<Teacher>();
+            return await this.db.getTeachers(facultyName, count, offset);
         }
 
         // POST teachers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] Teacher teacher)
         {
+            await this.db.insertTeacher(teacher);
+
             return Ok();
         }
 
@@ -34,6 +45,8 @@ namespace Backend.Controllers
         public async Task<ActionResult> Put([FromBody] Teacher newTeacher,
                                             [FromQuery] string teacherName)
         {
+            await this.db.updateTeacher(teacherName, newTeacher);
+
             return Ok();
         }
 
@@ -41,6 +54,8 @@ namespace Backend.Controllers
         [HttpDelete]
         public async Task<ActionResult> Delete([FromQuery] string teacherName)
         {
+            await this.db.removeTeacher(teacherName);
+
             return Ok();
         }
 

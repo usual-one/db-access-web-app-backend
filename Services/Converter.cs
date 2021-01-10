@@ -12,15 +12,38 @@ namespace Backend.Services
         }
 
         public Models.Group fromDbModel(Models.Db.Group group,
-                                        Models.Db.Faculty groupFaculty)
+                                        Models.Db.Faculty faculty)
         {
             return new Models.Group()
             {
                 name = group.name,
                 year = group.year,
                 type = group.type,
-                faculty = this.fromDbModel(groupFaculty)
+                faculty = this.fromDbModel(faculty)
             };
         }
+
+        public Models.Student fromDbModel(Models.Db.Student student,
+                                          Models.Db.Group group,
+                                          Models.Db.Faculty faculty)
+        {
+            return new Models.Student()
+            {
+                name = student.name,
+                group = this.fromDbModel(group, faculty),
+                state = student.state
+            };
+        }
+
+        public Models.Teacher fromDbModel(Models.Db.Teacher teacher,
+                                          Models.Db.Faculty faculty)
+        {
+            return new Models.Teacher()
+            {
+                name = teacher.name,
+                faculty = this.fromDbModel(faculty)
+            };
+        }
+
     }
 }

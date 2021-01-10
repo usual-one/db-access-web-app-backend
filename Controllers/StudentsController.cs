@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using Backend.Models;
-
 
 namespace Backend.Controllers
 {
@@ -13,25 +11,38 @@ namespace Backend.Controllers
     public class StudentsController : ControllerBase
     {
 
+        public StudentsController()
+        {
+            this.db = new Services.Database();
+        }
+
+        private Services.Database db;
+
         // GET students
         [HttpGet]
-        public async Task<ActionResult<List<Student>>> Get([FromQuery] string groupName)
+        public async Task<ActionResult<List<Models.Student>>> Get([FromQuery] string groupName,
+                                                                  [FromQuery] int count = 10,
+                                                                  [FromQuery] int offset = 0)
         {
-            return new List<Student>();
+            return await this.db.getStudents(groupName, count, offset);
         }
 
         // POST students
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] Student student)
+        public async Task<ActionResult> Post([FromBody] Models.Student student)
         {
+            await this.db.insertStudent(student);
+
             return Ok();
         }
 
         // PUT students
         [HttpPut]
-        public async Task<ActionResult> Put([FromBody] Student newStudent,
+        public async Task<ActionResult> Put([FromBody] Models.Student newStudent,
                                             [FromQuery] string studentName)
         {
+            await this.db.updateStudent(studentName, newStudent);
+            
             return Ok();
         }
 
@@ -39,6 +50,8 @@ namespace Backend.Controllers
         [HttpDelete]
         public async Task<ActionResult> Delete([FromQuery] string studentName)
         {
+            await this.db.removeStudent(studentName);
+
             return Ok();
         }
 
