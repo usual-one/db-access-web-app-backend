@@ -2,6 +2,8 @@ namespace Backend.Models
 {
     public class Group
     {
+        public int id { get; set; }
+        
         public string name { get; set; }
 
         public Faculty faculty { get; set; }

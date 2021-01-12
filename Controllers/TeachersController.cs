@@ -24,17 +24,23 @@ namespace Backend.Controllers
 
         // GET teachers
         [HttpGet]
-        public async Task<ActionResult<List<Teacher>>> Get([FromQuery] string facultyName,
-                                                           [FromQuery] int count,
-                                                           [FromQuery] int offset )
+        public async Task<ActionResult<List<Teacher>>> Get([FromQuery] int facultyId,
+                                                           [FromQuery] int count = 10,
+                                                           [FromQuery] int offset = 0)
         {
-            return await this.db.getTeachers(facultyName, count, offset);
+            if (facultyId == null)
+                return BadRequest();
+
+            return await this.db.getTeachers(facultyId, count, offset);
         }
 
         // POST teachers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] Teacher teacher)
         {
+            if (teacher == null)
+                return BadRequest();
+
             await this.db.insertTeacher(teacher);
 
             return Ok();
@@ -42,19 +48,25 @@ namespace Backend.Controllers
 
         // PUT teachers
         [HttpPut]
-        public async Task<ActionResult> Put([FromBody] Teacher newTeacher,
-                                            [FromQuery] string teacherName)
+        public async Task<ActionResult> Put([FromBody] Teacher teacher,
+                                            [FromQuery] int id)
         {
-            await this.db.updateTeacher(teacherName, newTeacher);
+            if (teacher == null || id == null)
+                return BadRequest();
+
+            await this.db.updateTeacher(id, teacher);
 
             return Ok();
         }
 
         // DELETE teachers
         [HttpDelete]
-        public async Task<ActionResult> Delete([FromQuery] string teacherName)
+        public async Task<ActionResult> Delete([FromQuery] int id)
         {
-            await this.db.removeTeacher(teacherName);
+            if (id == null)
+                return BadRequest();
+
+            await this.db.removeTeacher(id);
 
             return Ok();
         }

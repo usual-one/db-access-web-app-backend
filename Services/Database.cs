@@ -35,14 +35,14 @@ namespace Backend.Services
             return faculties;
         }
 
-        public async Task<List<Models.Group>> getGroups(string facultyName,
+        public async Task<List<Models.Group>> getGroups(int facultyId,
                                                         int count,
                                                         int offset)
         {
-            Models.Db.Faculty dbFaculty = await this.getDbFaculty(name: facultyName);            
+            Models.Db.Faculty dbFaculty = await this.getDbFaculty(id: facultyId);            
 
             List<Models.Db.Group> dbGroups = await this.student_group.FromSqlRaw(
-                $"select * from student_group where faculty_id={dbFaculty.id} limit {count} offset {offset}")
+                $"select * from student_group where faculty_id={facultyId} limit {count} offset {offset}")
                 .ToListAsync();
 
             List<Models.Group> groups  = new List<Models.Group>();
@@ -52,15 +52,15 @@ namespace Backend.Services
             return groups;
         }
 
-        public async Task<List<Models.Student>> getStudents(string groupName,
+        public async Task<List<Models.Student>> getStudents(int groupId,
                                                             int count,
                                                             int offset)
         {
-            Models.Db.Group dbGroup = await this.getDbGroup(name: groupName);
+            Models.Db.Group dbGroup = await this.getDbGroup(id: groupId);
             Models.Db.Faculty dbFaculty = await this.getDbFaculty(id: dbGroup.faculty_id);
 
             List<Models.Db.Student> dbStudents = await this.student.FromSqlRaw(
-                $"select * from student where group_id={dbGroup.id} limit {count} offset {offset}")
+                $"select * from student where group_id={groupId} limit {count} offset {offset}")
                 .ToListAsync();
 
             List<Models.Student> students = new List<Models.Student>();
@@ -70,14 +70,14 @@ namespace Backend.Services
             return students;
         }
 
-        public async Task<List<Models.Teacher>> getTeachers(string facultyName,
+        public async Task<List<Models.Teacher>> getTeachers(int facultyId,
                                                             int count,
                                                             int offset)
         {
-            Models.Db.Faculty dbFaculty = await this.getDbFaculty(name: facultyName);
+            Models.Db.Faculty dbFaculty = await this.getDbFaculty(id: facultyId);
 
             List<Models.Db.Teacher> dbTeachers = await this.teacher.FromSqlRaw(
-                $"select * from teacher where faculty_id={dbFaculty}")
+                $"select * from teacher where faculty_id={facultyId}")
                 .ToListAsync();
 
             List<Models.Teacher> teachers = new List<Models.Teacher>();
@@ -89,48 +89,42 @@ namespace Backend.Services
 
         public async Task insertStudent(Models.Student student)
         {
-            Models.Db.Group dbGroup = await this.getDbGroup(name: student.group.name);
-
-            this.student.FromSqlRaw(
-                $"insert into student (name, state, group_id) values ('{student.name}', '{student.state}', {dbGroup.id})");
+            this.Database.ExecuteSqlCommand(
+                "insert into student (name, state, group_id) values ({0}, {1}, {2})",
+                student.name, student.state, student.group.id);
         }
 
         public async Task insertTeacher(Models.Teacher teacher)
         {
-            Models.Db.Faculty dbFaculty = await this.getDbFaculty(name: teacher.faculty.name);
-
-            this.teacher.FromSqlRaw(
-                $"insert into teacher (name, faculty_id) values ({teacher.name}, {dbFaculty.id})");
+            this.Database.ExecuteSqlCommand(
+                "insert into teacher (name, faculty_id) values ({0}, {1})",
+                teacher.name, teacher.faculty.id);
         }
 
-        public async Task removeStudent(string studentName)
+        public async Task removeStudent(int id)
         {
-            this.student.FromSqlRaw(
-                $"delete from student where name='{studentName}'");
+            this.Database.ExecuteSqlCommand(
+                "delete from student where id={0}", id);
         }
 
-        public async Task removeTeacher(string teacherName)
+        public async Task removeTeacher(int id)
         {
-            this.teacher.FromSqlRaw(
-                $"delete from teacher where name='{teacherName}'");
+            this.Database.ExecuteSqlCommand(
+                "delete from teacher where id={0}", id);
         }
 
-        public async Task updateStudent(string studentName,
-                                        Models.Student update)
+        public async Task updateStudent(int id, Models.Student update)
         {
-            Models.Db.Group group = await this.getDbGroup(name: update.group.name);
-
-            this.student.FromSqlRaw(
-                $"update student set name='{update.name}', state='{update.state}', group_id={group.id} where name='{studentName}'");
+            this.Database.ExecuteSqlCommand(
+                "update student set name={0}, state={1}, group_id={2} where id={3}",
+                update.name, update.state, update.group.id, id);
         }
 
-        public async Task updateTeacher(string teacherName,
-                                        Models.Teacher update)
+        public async Task updateTeacher(int id, Models.Teacher update)
         {
-            Models.Db.Faculty faculty = await this.getDbFaculty(name: update.faculty.name);
-
-            this.teacher.FromSqlRaw(
-                $"update teacher set name='{update.name}', faculty_id={faculty.id} where name='{teacherName}'");
+            this.Database.ExecuteSqlCommand(
+                "update teacher set name={0}, faculty_id={1} where id={2}",
+                update.name, update.faculty.id, id);
         }
 
         private async Task<Models.Db.Faculty> getDbFaculty(string? name = null,
@@ -147,7 +141,7 @@ namespace Backend.Services
                     .ToListAsync())[0];
             else if (id != null)
                 return (await this.faculty.FromSqlRaw(
-                    $"select * from faculty where id='{id}'")
+                    $"select * from faculty where id={id}")
                     .ToListAsync())[0];
             else
                 return null;
@@ -162,7 +156,7 @@ namespace Backend.Services
                     .ToListAsync())[0];
             else if (id != null)
                 return (await this.student_group.FromSqlRaw(
-                    $"select * from student_group where id='{id}'")
+                    $"select * from student_group where id={id}")
                     .ToListAsync())[0];
             else
                 return null;

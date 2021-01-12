@@ -31,11 +31,14 @@ namespace Backend.Controllers
 
         // GET structure/groups
         [HttpGet("groups")]
-        public async Task<ActionResult<List<Group>>> Faculties([FromQuery] string facultyname = "",
-                                                               [FromQuery] int count = 10,
-                                                               [FromQuery] int offset = 0)
+        public async Task<ActionResult<List<Group>>> Groups([FromQuery] int facultyId,
+                                                            [FromQuery] int count = 10,
+                                                            [FromQuery] int offset = 0)
         {
-            return await this.db.getGroups(facultyname, count, offset);
+            if (facultyId == null)
+               return BadRequest(); 
+
+            return await this.db.getGroups(facultyId, count, offset);
         }
 
     }

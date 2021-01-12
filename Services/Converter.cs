@@ -6,6 +6,7 @@ namespace Backend.Services
         {
             return new Models.Faculty()
             {
+                id = faculty.id,
                 name = faculty.name,
                 briefName = faculty.brief_name
             };
@@ -16,6 +17,7 @@ namespace Backend.Services
         {
             return new Models.Group()
             {
+                id = group.id,
                 name = group.name,
                 year = group.year,
                 type = group.type,
@@ -29,6 +31,7 @@ namespace Backend.Services
         {
             return new Models.Student()
             {
+                id = student.id,
                 name = student.name,
                 group = this.fromDbModel(group, faculty),
                 state = student.state
@@ -40,6 +43,7 @@ namespace Backend.Services
         {
             return new Models.Teacher()
             {
+                id = teacher.id,
                 name = teacher.name,
                 faculty = this.fromDbModel(faculty)
             };
