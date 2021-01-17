@@ -29,6 +29,43 @@ namespace Backend.Controllers
             return await this.db.getFaculties(count, offset);
         }
 
+        // POST structure/faculties
+        [HttpPost("faculties")]
+        public async Task<ActionResult> Faculties([FromBody] Models.Faculty faculty)
+        {
+            if (faculty == null)
+                return BadRequest();
+            
+            await this.db.insertFaculty(faculty);
+
+            return Ok();
+        }
+
+        // PUT structure/faculties
+        [HttpPut("faculties")]
+        public async Task<ActionResult> Faculties([FromBody] Models.Faculty faculty,
+                                            [FromQuery] int id)
+        {
+            if (faculty == null || id == null)
+                return BadRequest();
+
+            await this.db.updateFaculty(id, faculty);
+            
+            return Ok();
+        }
+
+        // DELETE structure/faculties
+        [HttpDelete("faculties")]
+        public async Task<ActionResult> Faculties([FromQuery] int id)
+        {
+            if (id == null)
+                return BadRequest();
+            
+            await this.db.removeFaculty(id);
+
+            return Ok();
+        }
+
         // GET structure/groups
         [HttpGet("groups")]
         public async Task<ActionResult<List<Group>>> Groups([FromQuery] int facultyId,
@@ -39,6 +76,43 @@ namespace Backend.Controllers
                return BadRequest(); 
 
             return await this.db.getGroups(facultyId, count, offset);
+        }
+
+        // POST structure/groups
+        [HttpPost("groups")]
+        public async Task<ActionResult> Groups([FromBody] Models.Group group)
+        {
+            if (group == null)
+                return BadRequest();
+            
+            await this.db.insertGroup(group);
+
+            return Ok();
+        }
+
+        // PUT structure/groups
+        [HttpPut("groups")]
+        public async Task<ActionResult> Groups([FromBody] Models.Group group,
+                                               [FromQuery] int id)
+        {
+            if (group == null || id == null)
+                return BadRequest();
+
+            await this.db.updateGroup(id, group);
+            
+            return Ok();
+        }
+
+        // DELETE structure/groups
+        [HttpDelete("groups")]
+        public async Task<ActionResult> Groups([FromQuery] int id)
+        {
+            if (id == null)
+                return BadRequest();
+            
+            await this.db.removeGroup(id);
+
+            return Ok();
         }
 
     }
