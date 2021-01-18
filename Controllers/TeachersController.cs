@@ -41,7 +41,14 @@ namespace Backend.Controllers
             if (teacher == null)
                 return BadRequest();
 
-            await this.db.insertTeacher(teacher);
+            try
+            {
+                await this.db.insertTeacher(teacher);
+            }
+            catch (System.ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
 
             return Ok();
         }
@@ -54,7 +61,14 @@ namespace Backend.Controllers
             if (teacher == null || id == null)
                 return BadRequest();
 
-            await this.db.updateTeacher(id, teacher);
+            try
+            {
+                await this.db.updateTeacher(id, teacher);
+            }
+            catch (System.ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
 
             return Ok();
         }

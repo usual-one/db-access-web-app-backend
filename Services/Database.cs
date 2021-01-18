@@ -103,6 +103,9 @@ namespace Backend.Services
         public async Task insertGroup(Models.Group group)
         {
             Models.Db.Faculty dbFaculty = await this.getDbFaculty(briefName: group.faculty.briefName);
+            if (dbFaculty == null)
+                throw new System.ArgumentException("invalid faculty");
+            
             this.Database.ExecuteSqlCommand(
                 "insert into student_group (name, year, type, faculty_id) values ({0}, {1}, {2}, {3})",
                 group.name, group.year, group.type, group.faculty.id);
@@ -111,6 +114,9 @@ namespace Backend.Services
         public async Task insertStudent(Models.Student student)
         {
             Models.Db.Group dbGroup = await this.getDbGroup(name: student.group.name);
+            if (dbGroup == null)
+                throw new System.ArgumentException("invalid group");
+            
             this.Database.ExecuteSqlCommand(
                 "insert into student (name, state, group_id) values ({0}, {1}, {2})",
                 student.name, student.state, dbGroup.id);
@@ -119,6 +125,9 @@ namespace Backend.Services
         public async Task insertTeacher(Models.Teacher teacher)
         {
             Models.Db.Faculty dbFaculty = await this.getDbFaculty(briefName: teacher.faculty.briefName);
+            if (dbFaculty == null)
+                throw new System.ArgumentException("invalid faculty");
+            
             this.Database.ExecuteSqlCommand(
                 "insert into teacher (name, faculty_id) values ({0}, {1})",
                 teacher.name, dbFaculty.id);
@@ -169,6 +178,9 @@ namespace Backend.Services
         public async Task updateGroup(int id, Models.Group update)
         {
             Models.Db.Faculty dbFaculty = await this.getDbFaculty(briefName: update.faculty.briefName);
+            if (dbFaculty == null)
+                throw new System.ArgumentException("invalid faculty");
+            
             this.Database.ExecuteSqlCommand(
                 "update student_group set name={0}, faculty_id={1}, year={2}, type={3} where id={4}",
                 update.name, dbFaculty.id, update.year, update.type, id);
@@ -177,6 +189,9 @@ namespace Backend.Services
         public async Task updateStudent(int id, Models.Student update)
         {
             Models.Db.Group dbGroup = await this.getDbGroup(name: update.group.name);
+            if (dbGroup == null)
+                throw new System.ArgumentException("invalid group");
+            
             this.Database.ExecuteSqlCommand(
                 "update student set name={0}, state={1}, group_id={2} where id={3}",
                 update.name, update.state, dbGroup.id, id);
@@ -185,6 +200,9 @@ namespace Backend.Services
         public async Task updateTeacher(int id, Models.Teacher update)
         {
             Models.Db.Faculty dbFaculty = await this.getDbFaculty(briefName: update.faculty.briefName);
+            if (dbFaculty == null)
+                throw new System.ArgumentException("invalid faculty");
+            
             this.Database.ExecuteSqlCommand(
                 "update teacher set name={0}, faculty_id={1} where id={2}",
                 update.name, dbFaculty.id, id);
@@ -194,35 +212,49 @@ namespace Backend.Services
                                                            string? briefName = null,
                                                            int? id = null)
         {
+            List<Models.Db.Faculty> faculties = null;
+
             if (name != null)
-                return (await this.faculty.FromSqlRaw(
+                faculties = await this.faculty.FromSqlRaw(
                     $"select * from faculty where name='{name}'")
-                    .ToListAsync())[0];
+                    .ToListAsync();
             else if (briefName != null)
-                return (await this.faculty.FromSqlRaw(
+                faculties = await this.faculty.FromSqlRaw(
                     $"select * from faculty where brief_name='{briefName}'")
-                    .ToListAsync())[0];
+                    .ToListAsync();
             else if (id != null)
-                return (await this.faculty.FromSqlRaw(
+                faculties = await this.faculty.FromSqlRaw(
                     $"select * from faculty where id={id}")
-                    .ToListAsync())[0];
+                    .ToListAsync();
             else
                 return null;
+
+            if (faculties.Count != 1)
+                return null;
+
+            return faculties[0];
         }
 
         private async Task<Models.Db.Group> getDbGroup(string? name = null,
                                                        int? id = null)
         {
+            List<Models.Db.Group> groups = null;
+
             if (name != null)
-                return (await this.student_group.FromSqlRaw(
+                groups = await this.student_group.FromSqlRaw(
                     $"select * from student_group where name='{name}'")
-                    .ToListAsync())[0];
+                    .ToListAsync();
             else if (id != null)
-                return (await this.student_group.FromSqlRaw(
+                groups = await this.student_group.FromSqlRaw(
                     $"select * from student_group where id={id}")
-                    .ToListAsync())[0];
+                    .ToListAsync();
             else
                 return null;
+
+            if (groups.Count != 1)
+                return null;
+
+            return groups[0];
         }
 
     }

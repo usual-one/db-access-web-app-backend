@@ -85,7 +85,14 @@ namespace Backend.Controllers
             if (group == null)
                 return BadRequest();
             
-            await this.db.insertGroup(group);
+            try
+            {
+                await this.db.insertGroup(group);
+            }
+            catch (System.ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
 
             return Ok();
         }
@@ -98,8 +105,15 @@ namespace Backend.Controllers
             if (group == null || id == null)
                 return BadRequest();
 
-            await this.db.updateGroup(id, group);
-            
+            try
+            {
+                await this.db.updateGroup(id, group);
+            }
+            catch (System.ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
+
             return Ok();
         }
 
